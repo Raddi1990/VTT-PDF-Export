@@ -45,7 +45,7 @@
     ]
   },
   "url": "https://github.com/Raddi1990/VTT-PDF-Export",
-  "manifest": "https://github.com/Raddi1990/VTT-PDF-Export/releases/latest/download/module.json",
+  "manifest": "https://raw.githubusercontent.com/Raddi1990/VTT-PDF-Export/main/module.json",
   "download": "https://github.com/Raddi1990/VTT-PDF-Export/releases/latest/download/module.zip",
   "readme": "https://github.com/Raddi1990/VTT-PDF-Export/blob/main/README.md",
   "bugs": "https://github.com/Raddi1990/VTT-PDF-Export/issues",

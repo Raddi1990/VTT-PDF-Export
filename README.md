@@ -42,8 +42,14 @@ Alternativ kannst du in den Moduleinstellungen unter **Eigenes Feld-Mapping** ei
 
 ## Installation in Forge VTT
 
-1. Repo zu GitHub pushen, ein Release mit `module.json`, `src/`, `scripts/`, `lang/`, `styles/` als `module.zip` anhängen (oder die Manifest-URL direkt auf die Rohdateien im Repo zeigen lassen).
-2. In Forge: **Setup → Install Module → Manifest URL** → URL zur `module.json` eintragen.
+Manifest-URL (`module.json` direkt aus dem `main`-Branch):
+
+```
+https://raw.githubusercontent.com/Raddi1990/VTT-PDF-Export/main/module.json
+```
+
+1. In Forge: **Setup → Install Module → Manifest URL** → obige URL eintragen.
+2. Hinweis: Damit der Download beim Installieren funktioniert, muss zusätzlich ein GitHub-Release mit einem `module.zip` (enthält `module.json`, `src/`, `scripts/`, `lang/`, `styles/`) erstellt werden, dessen URL im `download`-Feld der `module.json` hinterlegt ist — bisher gibt es noch kein Release. Bis dahin funktioniert nur die manuelle Installation per Ordner-Kopie (siehe Setup oben).
 
 ## Lizenz
 

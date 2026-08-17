@@ -3,7 +3,12 @@ import { MODULE_ID } from "./settings.js";
 
 // pdf-lib is loaded as a plain script (scripts/vendor/pdf-lib.min.js) and
 // exposes itself as the global `PDFLib`, so no bundler is required.
-const { PDFDocument } = PDFLib;
+const { PDFDocument, ParseSpeeds } = PDFLib;
+
+// Default parsing is thorough but can take many seconds on real-world
+// fillable forms; Fastest is safe for well-formed PDFs like official
+// character sheets and cuts load time drastically.
+const LOAD_OPTIONS = { parseSpeed: ParseSpeeds.Fastest };
 
 async function loadBundledMap(profile) {
   const url = new URL(`./field-map/${profile}.json`, import.meta.url);
@@ -73,7 +78,7 @@ export async function exportActorToPdf(actor) {
   const data = flattenData(extractCharacterData(actor));
   const fieldMap = await loadFieldMap();
 
-  const pdfDoc = await PDFDocument.load(templateBytes);
+  const pdfDoc = await PDFDocument.load(templateBytes, LOAD_OPTIONS);
   const form = pdfDoc.getForm();
 
   for (const [dataKey, fieldName] of Object.entries(fieldMap)) {
@@ -103,7 +108,7 @@ export async function exportActorToPdf(actor) {
 export async function listPdfFields() {
   const templateBytes = await fetchTemplateBytes();
   if (!templateBytes) return [];
-  const pdfDoc = await PDFDocument.load(templateBytes);
+  const pdfDoc = await PDFDocument.load(templateBytes, LOAD_OPTIONS);
   const form = pdfDoc.getForm();
   const fields = form.getFields().map(f => ({ name: f.getName(), type: f.constructor.name }));
   console.table(fields);

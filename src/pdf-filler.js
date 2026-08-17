@@ -114,3 +114,32 @@ export async function listPdfFields() {
   console.table(fields);
   return fields;
 }
+
+// Some PDFs (e.g. forms run through an "auto-detect fields" tool instead of
+// the original AcroForm) have meaningless generated field names. Stamping
+// every field with its own name lets you read the mapping straight off the
+// rendered page instead of guessing field-by-field.
+export async function debugAnnotateFieldNames() {
+  const templateBytes = await fetchTemplateBytes();
+  if (!templateBytes) return;
+
+  const pdfDoc = await PDFDocument.load(templateBytes, LOAD_OPTIONS);
+  const form = pdfDoc.getForm();
+
+  for (const field of form.getFields()) {
+    const name = field.getName();
+    try {
+      if (typeof field.setText === "function") {
+        field.setText(name);
+        if (typeof field.setFontSize === "function") field.setFontSize(6);
+      } else if (typeof field.check === "function") {
+        field.check();
+      }
+    } catch (err) {
+      console.warn(`${MODULE_ID} | Konnte Feld "${name}" nicht annotieren:`, err);
+    }
+  }
+
+  const pdfBytes = await pdfDoc.save();
+  downloadBytes(pdfBytes, "field-name-debug.pdf");
+}

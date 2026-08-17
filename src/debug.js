@@ -1,1 +1,1 @@
-export { listPdfFields } from "./pdf-filler.js";
+export { listPdfFields, debugAnnotateFieldNames } from "./pdf-filler.js";

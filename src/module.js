@@ -1,6 +1,6 @@
 import { registerSettings, MODULE_ID } from "./settings.js";
 import { exportActorToPdf } from "./pdf-filler.js";
-import { listPdfFields } from "./debug.js";
+import { listPdfFields, debugAnnotateFieldNames } from "./debug.js";
 
 Hooks.once("init", () => {
   registerSettings();
@@ -8,7 +8,7 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", () => {
   const module = game.modules.get(MODULE_ID);
-  module.api = { exportActorToPdf, listPdfFields };
+  module.api = { exportActorToPdf, listPdfFields, debugAnnotateFieldNames };
 });
 
 function injectExportButton(app, html) {

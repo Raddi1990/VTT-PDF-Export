@@ -28,7 +28,17 @@ So findest du die echten Feldnamen deines PDFs:
 await game.modules.get("dnd5e-pdf-exporter").api.listPdfFields();
 ```
 
-Das listet in der Konsole alle Formularfelder (Name + Typ) des aktuell konfigurierten PDFs auf. Trage die passenden Namen direkt in `src/field-map/2024.json` ein (kein Build-Schritt nötig, einfach speichern und den Charakterbogen in Foundry neu öffnen).
+Das listet in der Konsole alle Formularfelder (Name + Typ) des aktuell konfigurierten PDFs auf.
+
+**Falls die Feldnamen wie `text_1imkp` oder `checkbox_78ywrl` aussehen:** Das PDF wurde nicht mit den originalen WotC-Feldnamen erstellt, sondern per Auto-Erkennung fillable gemacht — die Namen sind bedeutungslose IDs, nur ihre Position im Dokument zählt. In dem Fall hilft `listPdfFields()` allein nicht viel weiter; stattdessen:
+
+```js
+await game.modules.get("dnd5e-pdf-exporter").api.debugAnnotateFieldNames();
+```
+
+Das erzeugt ein PDF, in dem jedes Textfeld mit seinem eigenen internen Namen befüllt und jede Checkbox angehakt ist. Öffne die heruntergeladene Datei und lies direkt an jeder Position im Bogen ab, welcher interne Name dazugehört (z. B. steht im STR-Feld dann `text_9efgi`).
+
+Trage die passenden Namen anschließend in `src/field-map/2024.json` ein (kein Build-Schritt nötig, einfach speichern und den Charakterbogen in Foundry neu öffnen).
 
 Alternativ kannst du in den Moduleinstellungen unter **Eigenes Feld-Mapping** eine eigene JSON-Datei (gleiches Format wie `src/field-map/2014.json`) hinterlegen.
 
@@ -48,8 +58,9 @@ Manifest-URL (`module.json` direkt aus dem `main`-Branch):
 https://raw.githubusercontent.com/Raddi1990/VTT-PDF-Export/main/module.json
 ```
 
-1. In Forge: **Setup → Install Module → Manifest URL** → obige URL eintragen.
-2. Hinweis: Damit der Download beim Installieren funktioniert, muss zusätzlich ein GitHub-Release mit einem `module.zip` (enthält `module.json`, `src/`, `scripts/`, `lang/`, `styles/`) erstellt werden, dessen URL im `download`-Feld der `module.json` hinterlegt ist — bisher gibt es noch kein Release. Bis dahin funktioniert nur die manuelle Installation per Ordner-Kopie (siehe Setup oben).
+In Forge: **Setup → Install Module → Manifest URL** → obige URL eintragen.
+
+Neue Versionen werden als GitHub-Release (mit `module.zip`) veröffentlicht; die `download`-URL in der `module.json` zeigt jeweils auf das zum aktuellen `version`-Feld passende Tag, siehe [Releases](https://github.com/Raddi1990/VTT-PDF-Export/releases).
 
 ## Lizenz
 

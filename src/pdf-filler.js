@@ -152,6 +152,14 @@ function findWidgetPage(pdfDoc, widget) {
 // checkbox, and auto-sizes unpredictably for some multiline fields), this
 // draws every field's name directly onto the page at its widget's position -
 // works uniformly for text fields, textareas and checkboxes alike.
+//
+// The label is placed a few points above the widget (not on top of it):
+// small checkboxes sit directly next to their printed label (e.g. a skill
+// name), and a label drawn right on the checkbox ends up in the same text
+// row as that printed label - tools that extract positioned text (used to
+// read this back when the sheet is too dense to inspect visually) then
+// interleave the two character-by-character instead of keeping them apart.
+// Shifting the label onto the blank line above keeps it a separate row.
 export async function debugAnnotateFieldNames() {
   const templateBytes = await fetchTemplateBytes();
   if (!templateBytes) return;
@@ -165,8 +173,8 @@ export async function debugAnnotateFieldNames() {
       try {
         const page = findWidgetPage(pdfDoc, widget);
         if (!page) continue;
-        const { x, y } = widget.getRectangle();
-        page.drawText(name, { x: x + 1, y: y + 1, size: 4, color: rgb(0.85, 0, 0) });
+        const { x, y, height } = widget.getRectangle();
+        page.drawText(`»${name}`, { x, y: y + height + 2, size: 4, color: rgb(0.85, 0, 0) });
       } catch (err) {
         console.warn(`${MODULE_ID} | Konnte Feld "${name}" nicht auf der Seite beschriften:`, err);
       }

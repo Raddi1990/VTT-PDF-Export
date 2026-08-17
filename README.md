@@ -22,9 +22,11 @@ Kein Build-Schritt nötig — `pdf-lib` liegt als fertiges Browser-Bundle unter 
 
 ## Feld-Mapping kalibrieren
 
-Die Feldnamen offizieller PDF-Formulare unterscheiden sich je nach Auflage/Revision. Das mitgelieferte Mapping für 2014 basiert auf den seit Jahren dokumentierten Standard-Feldnamen; das 2024-Mapping (`src/field-map/2024.json`) ist **unverifiziert** und muss vor der ersten Nutzung befüllt werden.
+Die Feldnamen offizieller PDF-Formulare unterscheiden sich je nach Auflage/Revision. Das mitgelieferte Mapping für 2014 basiert auf den seit Jahren dokumentierten Standard-Feldnamen. Das 2024-Mapping (`src/field-map/2024.json`) wurde am 2026-08-17 anhand eines konkreten `debugAnnotateFieldNames()`-Exports (Formularversion `670D3898000001`) befüllt und deckt bereits alle Text- und Freitextfelder ab (Name, Werte, Attribute, Waffentabelle, Zauber-Header, Geld, Sprachen, Hintergrundtext, …).
 
-So findest du die echten Feldnamen deines PDFs:
+**Noch nicht enthalten sind alle Checkboxen** (Rettungswurf-/Fertigkeiten-Proficiency, Todesrettungswürfe, Rüstungstraining, Zaubervorbereitung/-plätze) sowie die große Zauberliste und drei Freitext-Boxen auf Seite 1 (Class Features, Species Traits, Feats) — Details dazu steht im `_note`-Feld von `src/field-map/2024.json`.
+
+So findest du die echten Feldnamen deines PDFs, falls du das Mapping erweitern oder für eine andere PDF-Version neu aufbauen willst:
 
 ```js
 await game.modules.get("dnd5e-pdf-exporter").api.listPdfFields();
@@ -38,7 +40,7 @@ Das listet in der Konsole alle Formularfelder (Name + Typ) des aktuell konfiguri
 await game.modules.get("dnd5e-pdf-exporter").api.debugAnnotateFieldNames();
 ```
 
-Das erzeugt ein PDF, in dem jedes Textfeld mit seinem eigenen internen Namen befüllt und jede Checkbox angehakt ist, und öffnet es direkt in einem Fenster in Foundry (siehe Hinweis oben, falls der automatische Download nicht anspringt). Lies direkt an jeder Position im Bogen ab, welcher interne Name dazugehört (z. B. steht im STR-Feld dann `text_9efgi`).
+Das zeichnet den internen Namen jedes Feldes direkt an dessen Position auf die Seite (funktioniert dadurch auch für Checkboxen, die sonst alle gleich aussehen) und öffnet das Ergebnis in einem Fenster in Foundry (siehe Hinweis oben, falls der automatische Download nicht anspringt). Lies direkt an jeder Position im Bogen ab, welcher interne Name dazugehört.
 
 Trage die passenden Namen anschließend in `src/field-map/2024.json` ein (kein Build-Schritt nötig, einfach speichern und den Charakterbogen in Foundry neu öffnen).
 

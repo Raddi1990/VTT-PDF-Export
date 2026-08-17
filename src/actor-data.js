@@ -1,5 +1,18 @@
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 
+const SIZE_LABELS = {
+  tiny: "Tiny",
+  sm: "Small",
+  small: "Small",
+  med: "Medium",
+  medium: "Medium",
+  lg: "Large",
+  large: "Large",
+  huge: "Huge",
+  grg: "Gargantuan",
+  gargantuan: "Gargantuan"
+};
+
 // dnd5e's schema shifts between core versions; every lookup below falls back
 // across the paths seen in 2014- and 2024-rules data models.
 function findItemName(actor, types) {
@@ -54,11 +67,22 @@ function buildSpellsText(actor) {
   return spells;
 }
 
-function buildAttacksText(actor) {
-  return actor.items
-    .filter(i => i.type === "weapon")
-    .map(i => `${i.name}  ${i.labels?.toHit ?? ""}  ${i.labels?.damage ?? ""}`.trim())
-    .join("\n");
+// The official sheet's weapon table has fixed name/attack/damage/notes
+// columns per row (6 rows), so weapons are exposed as indexed fields
+// (weapon1..weapon6) rather than one combined text block.
+function buildWeaponRows(actor) {
+  const weapons = actor.items.filter(i => i.type === "weapon").slice(0, 6);
+  const rows = {};
+  for (let i = 0; i < 6; i++) {
+    const w = weapons[i];
+    rows[`weapon${i + 1}`] = {
+      name: w?.name ?? "",
+      atkBonus: w?.labels?.toHit ?? "",
+      damage: w?.labels?.damage ?? "",
+      notes: ""
+    };
+  }
+  return rows;
 }
 
 function buildInventoryText(actor) {
@@ -71,17 +95,36 @@ function buildInventoryText(actor) {
 export function extractCharacterData(actor) {
   const sys = actor.system;
 
+  const species = sys.details?.race?.name ?? sys.details?.species?.name ?? findItemName(actor, ["race", "species"]);
+  const subclass = findItemName(actor, ["subclass"]);
+  const background = sys.details?.background?.name ?? findItemName(actor, ["background"]);
+  const classes = actor.items
+    .filter(i => i.type === "class")
+    .map(i => `${i.name} ${i.system.levels ?? ""}`.trim())
+    .join(", ");
+
+  const rawSize = sys.traits?.size ?? "";
+  const size = SIZE_LABELS[rawSize] ?? rawSize;
+
+  const personality = sys.details?.trait ?? "";
+  const ideals = sys.details?.ideal ?? "";
+  const bonds = sys.details?.bond ?? "";
+  const flaws = sys.details?.flaw ?? "";
+
   return {
     name: actor.name,
-    species: sys.details?.race?.name ?? sys.details?.species?.name ?? findItemName(actor, ["race", "species"]),
-    classes: actor.items
-      .filter(i => i.type === "class")
-      .map(i => `${i.name} ${i.system.levels ?? ""}`.trim())
-      .join(", "),
-    background: sys.details?.background?.name ?? findItemName(actor, ["background"]),
+    species,
+    subclass,
+    classes,
+    background,
+    // The sheet's top box has one combined line for "Background / Class"
+    // and one for "Species / Subclass" rather than four separate fields.
+    backgroundClass: [background, classes].filter(Boolean).join("   —   "),
+    speciesSubclass: [species, subclass].filter(Boolean).join("   —   "),
     alignment: sys.details?.alignment ?? "",
     xp: sys.details?.xp?.value ?? "",
     level: sys.details?.level ?? "",
+    size,
     proficiencyBonus: sys.attributes?.prof ?? 0,
     inspiration: !!sys.attributes?.inspiration,
     abilities: buildAbilities(sys),
@@ -95,6 +138,8 @@ export function extractCharacterData(actor) {
       temp: sys.attributes?.hp?.temp ?? ""
     },
     hitDice: `${sys.attributes?.hd?.value ?? sys.attributes?.hd?.total ?? ""} ${sys.attributes?.hd?.class ?? ""}`.trim(),
+    hitDiceMax: sys.attributes?.hd?.max ?? "",
+    hitDiceSpent: sys.attributes?.hd?.spent ?? "",
     passivePerception: sys.skills?.prc?.passive ?? "",
     deathSaves: {
       successes: sys.attributes?.death?.success ?? 0,
@@ -102,10 +147,12 @@ export function extractCharacterData(actor) {
     },
     spellcasting: {
       ability: sys.attributes?.spellcasting ?? "",
-      dc: sys.attributes?.spelldc ?? ""
+      modifier: sys.abilities?.[sys.attributes?.spellcasting]?.mod ?? "",
+      dc: sys.attributes?.spelldc ?? "",
+      attackBonus: sys.bonuses?.spell?.attack ?? ""
     },
     spells: buildSpellsText(actor),
-    attacksText: buildAttacksText(actor),
+    weapons: buildWeaponRows(actor),
     inventoryText: buildInventoryText(actor),
     currency: {
       cp: sys.currency?.cp ?? 0,
@@ -115,11 +162,21 @@ export function extractCharacterData(actor) {
       pp: sys.currency?.pp ?? 0
     },
     traits: {
-      personality: sys.details?.trait ?? "",
-      ideals: sys.details?.ideal ?? "",
-      bonds: sys.details?.bond ?? "",
-      flaws: sys.details?.flaw ?? ""
+      personality,
+      ideals,
+      bonds,
+      flaws
     },
+    // The sheet has one freeform "Backstory & Personality" box rather than
+    // four separate trait fields.
+    backstoryText: [
+      personality && `Personality Traits: ${personality}`,
+      ideals && `Ideals: ${ideals}`,
+      bonds && `Bonds: ${bonds}`,
+      flaws && `Flaws: ${flaws}`
+    ]
+      .filter(Boolean)
+      .join("\n"),
     proficiencies: {
       languages: joinValues(sys.traits?.languages?.value),
       armor: joinValues(sys.traits?.armorProf?.value),

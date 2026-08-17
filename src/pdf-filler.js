@@ -3,7 +3,7 @@ import { MODULE_ID } from "./settings.js";
 
 // pdf-lib is loaded as a plain script (scripts/vendor/pdf-lib.min.js) and
 // exposes itself as the global `PDFLib`, so no bundler is required.
-const { PDFDocument, ParseSpeeds } = PDFLib;
+const { PDFDocument, ParseSpeeds, rgb } = PDFLib;
 
 // Default parsing is thorough but can take many seconds on real-world
 // fillable forms; Fastest is safe for well-formed PDFs like official
@@ -131,10 +131,27 @@ export async function listPdfFields() {
   return fields;
 }
 
+// Finds which page a widget annotation lives on by matching its ref against
+// each page's /Annots array. Not part of pdf-lib's typed public API, but
+// page.node/context.lookup are the documented low-level escape hatches for
+// exactly this kind of annotation-position lookup.
+function findWidgetPage(pdfDoc, widget) {
+  for (const page of pdfDoc.getPages()) {
+    const annots = page.node.Annots?.();
+    if (!annots) continue;
+    for (const ref of annots.asArray()) {
+      if (pdfDoc.context.lookup(ref) === widget.dict) return page;
+    }
+  }
+  return null;
+}
+
 // Some PDFs (e.g. forms run through an "auto-detect fields" tool instead of
-// the original AcroForm) have meaningless generated field names. Stamping
-// every field with its own name lets you read the mapping straight off the
-// rendered page instead of guessing field-by-field.
+// the original AcroForm) have meaningless generated field names. Rather than
+// relying on each field's own display (which can't show custom text for a
+// checkbox, and auto-sizes unpredictably for some multiline fields), this
+// draws every field's name directly onto the page at its widget's position -
+// works uniformly for text fields, textareas and checkboxes alike.
 export async function debugAnnotateFieldNames() {
   const templateBytes = await fetchTemplateBytes();
   if (!templateBytes) return;
@@ -144,15 +161,15 @@ export async function debugAnnotateFieldNames() {
 
   for (const field of form.getFields()) {
     const name = field.getName();
-    try {
-      if (typeof field.setText === "function") {
-        field.setText(name);
-        if (typeof field.setFontSize === "function") field.setFontSize(6);
-      } else if (typeof field.check === "function") {
-        field.check();
+    for (const widget of field.acroField.getWidgets()) {
+      try {
+        const page = findWidgetPage(pdfDoc, widget);
+        if (!page) continue;
+        const { x, y } = widget.getRectangle();
+        page.drawText(name, { x: x + 1, y: y + 1, size: 4, color: rgb(0.85, 0, 0) });
+      } catch (err) {
+        console.warn(`${MODULE_ID} | Konnte Feld "${name}" nicht auf der Seite beschriften:`, err);
       }
-    } catch (err) {
-      console.warn(`${MODULE_ID} | Konnte Feld "${name}" nicht annotieren:`, err);
     }
   }
 

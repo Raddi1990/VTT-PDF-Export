@@ -66,6 +66,18 @@ In Forge: **Setup → Install Module → Manifest URL** → obige URL eintragen.
 
 Neue Versionen werden als GitHub-Release (mit `module.zip`) veröffentlicht; die `download`-URL in der `module.json` zeigt jeweils auf das zum aktuellen `version`-Feld passende Tag, siehe [Releases](https://github.com/Raddi1990/VTT-PDF-Export/releases).
 
+### Release-Skript
+
+`tools/release.ps1` erledigt einen kompletten Release in einem Rutsch: `module.json`-Version hochzählen, committen/pushen, `module.zip` bauen, GitHub-Release anlegen und das Zip hochladen.
+
+```powershell
+.\tools\release.ps1 -Token "github_pat_..." 
+# oder mit expliziter Version und Release-Notes:
+.\tools\release.ps1 -Token "github_pat_..." -Version 1.0.0 -Notes "Erste stabile Version." -Prerelease:$false
+```
+
+Ohne `-Version` wird die Patch-Version aus `module.json` automatisch um 1 erhöht. Der Token braucht "Contents: Read and write" für dieses Repo (siehe oben) und wird nirgends gespeichert.
+
 ## Lizenz
 
 MIT (Modul-Code). `scripts/vendor/pdf-lib.min.js` ist die unveränderte, MIT-lizenzierte Browser-Bundle-Datei von [pdf-lib](https://github.com/Hopding/pdf-lib) (Lizenztext liegt daneben in `pdf-lib.LICENSE.md`). Das WotC-Charakterbogen-PDF selbst unterliegt eigenem Copyright und ist nicht Teil dieses Repos.

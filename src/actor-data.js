@@ -6,6 +6,12 @@ function findItemName(actor, types) {
   return actor.items.find(i => types.includes(i.type))?.name ?? "";
 }
 
+// dnd5e stores trait value lists (languages, weapon/armor proficiencies, ...)
+// as a Set, not an Array, so they need Array.from() before .join() works.
+function joinValues(values) {
+  return values ? Array.from(values).join(", ") : "";
+}
+
 function buildAbilities(sys) {
   const abilities = {};
   for (const key of ABILITIES) {
@@ -115,9 +121,9 @@ export function extractCharacterData(actor) {
       flaws: sys.details?.flaw ?? ""
     },
     proficiencies: {
-      languages: sys.traits?.languages?.value?.join(", ") ?? "",
-      armor: sys.traits?.armorProf?.value?.join(", ") ?? "",
-      weapons: sys.traits?.weaponProf?.value?.join(", ") ?? "",
+      languages: joinValues(sys.traits?.languages?.value),
+      armor: joinValues(sys.traits?.armorProf?.value),
+      weapons: joinValues(sys.traits?.weaponProf?.value),
       tools: sys.tools ? Object.keys(sys.tools).join(", ") : ""
     },
     featuresText: actor.items

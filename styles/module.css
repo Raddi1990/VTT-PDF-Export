@@ -1,0 +1,7 @@
+.pdf-exporter-button {
+  cursor: pointer;
+}
+
+.pdf-exporter-button:hover {
+  color: var(--color-warm-2, #ff6400);
+}

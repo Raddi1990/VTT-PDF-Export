@@ -1,0 +1,17 @@
+{
+  "PDFEXPORT.ButtonTitle": "Export character to PDF",
+  "PDFEXPORT.SettingTemplatePathName": "PDF template path",
+  "PDFEXPORT.SettingTemplatePathHint": "Path (in your Foundry Data storage) to your own legally obtained copy of the official fillable D&D 5e character sheet PDF. This file is not included with the module.",
+  "PDFEXPORT.SettingProfileName": "Character sheet edition",
+  "PDFEXPORT.SettingProfileHint": "Which official PDF form your template file is, so the correct field-name mapping is used.",
+  "PDFEXPORT.Profile2014": "2014 rules",
+  "PDFEXPORT.Profile2024": "2024 rules",
+  "PDFEXPORT.SettingCustomMapName": "Custom field-map JSON (optional)",
+  "PDFEXPORT.SettingCustomMapHint": "Path to your own field-mapping JSON file, if the bundled mapping doesn't match your PDF's field names. Overrides the edition setting above.",
+  "PDFEXPORT.SettingFlattenName": "Flatten PDF after filling",
+  "PDFEXPORT.SettingFlattenHint": "If enabled, form fields are flattened into static content so the exported PDF can no longer be edited.",
+  "PDFEXPORT.ErrorNoTemplate": "No PDF template configured. Set a template path in the module settings first.",
+  "PDFEXPORT.ErrorTemplateFetch": "Could not load the PDF template (HTTP {status}). Check the configured path.",
+  "PDFEXPORT.WarnCustomMapFailed": "Could not load the custom field-map file, falling back to the bundled mapping.",
+  "PDFEXPORT.InfoExportDone": "Exported {name} to PDF."
+}

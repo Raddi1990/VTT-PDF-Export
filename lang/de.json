@@ -1,0 +1,17 @@
+{
+  "PDFEXPORT.ButtonTitle": "Charakter als PDF exportieren",
+  "PDFEXPORT.SettingTemplatePathName": "Pfad zur PDF-Vorlage",
+  "PDFEXPORT.SettingTemplatePathHint": "Pfad (im Foundry-Datenverzeichnis) zu deiner eigenen, legal beschafften Kopie des offiziellen ausfuellbaren D&D-5e-Charakterbogen-PDFs. Diese Datei liegt nicht im Modul bei.",
+  "PDFEXPORT.SettingProfileName": "Charakterbogen-Edition",
+  "PDFEXPORT.SettingProfileHint": "Welches offizielle PDF-Formular deine Vorlage ist, damit das passende Feld-Mapping verwendet wird.",
+  "PDFEXPORT.Profile2014": "Regelwerk 2014",
+  "PDFEXPORT.Profile2024": "Regelwerk 2024",
+  "PDFEXPORT.SettingCustomMapName": "Eigenes Feld-Mapping (JSON, optional)",
+  "PDFEXPORT.SettingCustomMapHint": "Pfad zu einer eigenen Feld-Mapping-JSON-Datei, falls das mitgelieferte Mapping nicht zu den Feldnamen deines PDFs passt. Hat Vorrang vor der obigen Edition-Einstellung.",
+  "PDFEXPORT.SettingFlattenName": "PDF nach dem Befuellen flach machen",
+  "PDFEXPORT.SettingFlattenHint": "Wenn aktiviert, werden die Formularfelder in statischen Inhalt umgewandelt, sodass das exportierte PDF nicht mehr bearbeitbar ist.",
+  "PDFEXPORT.ErrorNoTemplate": "Keine PDF-Vorlage konfiguriert. Bitte zuerst einen Vorlagenpfad in den Moduleinstellungen festlegen.",
+  "PDFEXPORT.ErrorTemplateFetch": "Die PDF-Vorlage konnte nicht geladen werden (HTTP {status}). Bitte den konfigurierten Pfad pruefen.",
+  "PDFEXPORT.WarnCustomMapFailed": "Das eigene Feld-Mapping konnte nicht geladen werden, es wird auf das mitgelieferte Mapping zurueckgefallen.",
+  "PDFEXPORT.InfoExportDone": "{name} wurde als PDF exportiert."
+}

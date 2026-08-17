@@ -6,6 +6,8 @@
 
 .PARAMETER Token
   GitHub Personal Access Token with "Contents: Read and write" on the repo.
+  Optional if a .env file (see .env.example) with GITHUB_TOKEN=... exists in
+  the repo root - that value is used as a fallback.
 
 .PARAMETER Version
   Version to release, e.g. "0.1.7". Omit to auto-bump the current patch
@@ -30,7 +32,7 @@
   .\tools\release.ps1 -Token $env:GH_TOKEN -Version 1.0.0 -Prerelease:$false
 #>
 param(
-    [Parameter(Mandatory = $true)][string]$Token,
+    [string]$Token,
     [string]$Version,
     [string]$Notes = "",
     [string]$NotesFile,
@@ -44,6 +46,19 @@ $RepoName = "VTT-PDF-Export"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 
 Set-Location $RepoRoot
+
+if (-not $Token) {
+    $envPath = Join-Path $RepoRoot ".env"
+    if (Test-Path $envPath) {
+        $line = Get-Content $envPath | Where-Object { $_ -match '^\s*GITHUB_TOKEN\s*=\s*(.+)\s*$' } | Select-Object -First 1
+        if ($line -match '^\s*GITHUB_TOKEN\s*=\s*(.+?)\s*$') {
+            $Token = $Matches[1]
+        }
+    }
+}
+if (-not $Token) {
+    throw "No token given and none found in .env (GITHUB_TOKEN=...). Pass -Token or create .env from .env.example."
+}
 
 if ($NotesFile) {
     $Notes = Get-Content -Path $NotesFile -Raw

@@ -18,6 +18,8 @@ Kein Build-Schritt nötig — `pdf-lib` liegt als fertiges Browser-Bundle unter 
    - **Charakterbogen-Edition** auf `2014` oder `2024` setzen, je nachdem welches Formular du hast.
 5. Charakterbogen eines PCs öffnen → neuer PDF-Icon-Button im Fenster-Header → klicken.
 
+**Hinweis für Forge VTT:** Forge lädt die Spielsitzung in einem iframe, das automatisch ausgelöste Datei-Downloads teilweise blockiert. Das Modul versucht trotzdem einen normalen Download, öffnet das fertige PDF aber zusätzlich immer in einem Fenster innerhalb von Foundry — darin hat der eingebaute PDF-Viewer deines Browsers ein eigenes Download-/Speichern-Symbol in der Werkzeugleiste, das von dieser Einschränkung nicht betroffen ist.
+
 ## Feld-Mapping kalibrieren
 
 Die Feldnamen offizieller PDF-Formulare unterscheiden sich je nach Auflage/Revision. Das mitgelieferte Mapping für 2014 basiert auf den seit Jahren dokumentierten Standard-Feldnamen; das 2024-Mapping (`src/field-map/2024.json`) ist **unverifiziert** und muss vor der ersten Nutzung befüllt werden.
@@ -36,7 +38,7 @@ Das listet in der Konsole alle Formularfelder (Name + Typ) des aktuell konfiguri
 await game.modules.get("dnd5e-pdf-exporter").api.debugAnnotateFieldNames();
 ```
 
-Das erzeugt ein PDF, in dem jedes Textfeld mit seinem eigenen internen Namen befüllt und jede Checkbox angehakt ist. Öffne die heruntergeladene Datei und lies direkt an jeder Position im Bogen ab, welcher interne Name dazugehört (z. B. steht im STR-Feld dann `text_9efgi`).
+Das erzeugt ein PDF, in dem jedes Textfeld mit seinem eigenen internen Namen befüllt und jede Checkbox angehakt ist, und öffnet es direkt in einem Fenster in Foundry (siehe Hinweis oben, falls der automatische Download nicht anspringt). Lies direkt an jeder Position im Bogen ab, welcher interne Name dazugehört (z. B. steht im STR-Feld dann `text_9efgi`).
 
 Trage die passenden Namen anschließend in `src/field-map/2024.json` ein (kein Build-Schritt nötig, einfach speichern und den Charakterbogen in Foundry neu öffnen).
 

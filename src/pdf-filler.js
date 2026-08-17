@@ -59,16 +59,32 @@ async function fetchTemplateBytes() {
   return response.arrayBuffer();
 }
 
-function downloadBytes(bytes, filename) {
+function deliverPdf(bytes, filename) {
   const blob = new Blob([bytes], { type: "application/pdf" });
   const url = URL.createObjectURL(blob);
+
+  // Best-effort forced download; some hosting setups (e.g. Forge VTT embeds
+  // the game client in a sandboxed iframe) silently block this.
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
-  URL.revokeObjectURL(url);
+
+  // Always also show it inline so it's usable even if the download above
+  // was blocked - the browser's built-in PDF viewer has its own save/print
+  // controls that aren't subject to the host page's sandboxing.
+  new Dialog(
+    {
+      title: filename,
+      content: `<iframe src="${url}" style="width:100%;height:75vh;border:none;"></iframe>`,
+      buttons: {}
+    },
+    { width: 900, height: 800, resizable: true }
+  ).render(true);
+
+  setTimeout(() => URL.revokeObjectURL(url), 5 * 60 * 1000);
 }
 
 export async function exportActorToPdf(actor) {
@@ -101,7 +117,7 @@ export async function exportActorToPdf(actor) {
   if (game.settings.get(MODULE_ID, "flattenPdf")) form.flatten();
 
   const pdfBytes = await pdfDoc.save();
-  downloadBytes(pdfBytes, `${actor.name.replace(/[^a-z0-9]+/gi, "_")}.pdf`);
+  deliverPdf(pdfBytes, `${actor.name.replace(/[^a-z0-9]+/gi, "_")}.pdf`);
   ui.notifications.info(game.i18n.format("PDFEXPORT.InfoExportDone", { name: actor.name }));
 }
 
@@ -141,5 +157,5 @@ export async function debugAnnotateFieldNames() {
   }
 
   const pdfBytes = await pdfDoc.save();
-  downloadBytes(pdfBytes, "field-name-debug.pdf");
+  deliverPdf(pdfBytes, "field-name-debug.pdf");
 }
